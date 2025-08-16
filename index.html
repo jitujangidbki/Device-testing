@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Testing</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #f0f0f0;
+            --accent-color: #ff4757;
+            --glass-color: rgba(255, 255, 255, 0.15);
+            --neon-shadow: 0 0 5px #00f, 0 0 10px #00f, 0 0 20px #00f, 0 0 40px #00f;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: var(--primary-color);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #1e1e1e, #2d2d2d, #1e1e1e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s 0.3s, opacity 0.3s;
+        }
+
+        .modal-overlay.visible {
+            visibility: visible;
+            opacity: 1;
+            transition: visibility 0s, opacity 0.3s;
+        }
+
+        .modal {
+            background: var(--secondary-color);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.visible .modal {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            font-weight: 600;
+        }
+
+        .modal p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-yes {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        .btn-yes:hover {
+            background-color: #e84118;
+            transform: translateY(-2px);
+        }
+        
+        .btn-yes::after {
+            content: "Clicking this means you accept full responsibility.";
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 1;
+        }
+
+        .btn-yes:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .btn-cancel {
+            background: var(--glass-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0,0,0,0.2);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        #confirmation-popup .btn-accept, #confirmation-popup .btn-decline {
+            color: #fff;
+            padding: 10px 20px;
+        }
+        
+        #confirmation-popup .btn-accept {
+            background-color: #27ae60;
+        }
+
+        #confirmation-popup .btn-decline {
+            background-color: #7f8c8d;
+        }
+        
+        #countdown-message {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .modal {
+                padding: 20px;
+            }
+            .modal p {
+                font-size: 1rem;
+            }
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-animation"></div>
+
+    <div class="container">
+        <h1>Testing your device (mobile/pc)</h1>
+    </div>
+
+    <div id="notice-popup" class="modal-overlay">
+        <div class="modal">
+            <h2>Warning!</h2>
+            <p>Open at your own risk — Ye site sirf testing purpose ke liye hai. External link open karna aapki zimmedari hogi.</p>
+            <div class="modal-buttons">
+                <button id="yes-btn" class="btn btn-yes">Yes</button>
+                <button id="cancel-btn" class="btn btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmation-popup" class="modal-overlay">
+        <div class="modal">
+            <h2>Are you sure?</h2>
+            <p>Are you sure to open this?</p>
+            <div class="modal-buttons">
+                <button id="accept-btn" class="btn btn-accept">Accept</button>
+                <button id="decline-btn" class="btn btn-decline">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="countdown-popup" class="modal-overlay">
+        <div class="modal">
+            <p id="countdown-message">Verifying environment... <span id="countdown-timer">5</span></p>
+        </div>
+    </div>
+    
+    <div id="best-choice-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2>Best choice</h2>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const noticePopup = document.getElementById('notice-popup');
+            const confirmationPopup = document.getElementById('confirmation-popup');
+            const countdownPopup = document.getElementById('countdown-popup');
+            const bestChoiceOverlay = document.getElementById('best-choice-overlay');
+
+            const yesBtn = document.getElementById('yes-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const acceptBtn = document.getElementById('accept-btn');
+            const declineBtn = document.getElementById('decline-btn');
+            
+            const countdownTimerSpan = document.getElementById('countdown-timer');
+
+            // Disable back button
+            history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.go(1);
+            };
+
+            // Show initial notice popup
+            setTimeout(() => {
+                noticePopup.classList.add('visible');
+            }, 500);
+
+            yesBtn.addEventListener('click', () => {
+                localStorage.setItem('userChoice', 'Yes');
+                noticePopup.classList.remove('visible');
+                confirmationPopup.classList.add('visible');
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                localStorage.setItem('userChoice', 'Cancel');
+                noticePopup.classList.remove('visible');
+                bestChoiceOverlay.classList.add('visible');
+                setTimeout(() => {
+                    // This will not close the tab in most modern browsers due to security restrictions.
+                    // It's better to show a message.
+                    bestChoiceOverlay.classList.remove('visible');
+                }, 2000);
+            });
+
+            declineBtn.addEventListener('click', () => {
+                confirmationPopup.classList.remove('visible');
+                noticePopup.classList.add('visible');
+            });
+
+            acceptBtn.addEventListener('click', () => {
+                confirmationPopup.classList.remove('visible');
+                countdownPopup.classList.add('visible');
+                
+                let countdown = 5;
+                countdownTimerSpan.textContent = countdown;
+                
+                const interval = setInterval(() => {
+                    countdown--;
+                    countdownTimerSpan.textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        openLink();
+                    }
+                }, 1000);
+            });
+
+            function openLink() {
+                const urlToOpen = 'https://cznull.github.io/vsbm';
+                
+                // Referrer Blocker
+                const link = document.createElement('a');
+                link.href = urlToOpen;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                
+                try {
+                    link.click();
+                } catch (error) {
+                    countdownPopup.innerHTML = '<div class="modal"><p>Link failed to open. Please try again later.</p></div>';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
